@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$PG_SUPERUSER" --dbname "$PG_DB" <<-EOSQL
+    CREATE USER "${PG_WRITER_USER}" WITH PASSWORD '${PG_WRITER_PASS}';
+    GRANT CONNECT ON DATABASE dwd TO "${PG_WRITER_USER}";
+    GRANT INSERT, SELECT, UPDATE ON TABLE public.station TO "${PG_WRITER_USER}";
+    GRANT INSERT, SELECT, UPDATE ON TABLE public.temperature TO "${PG_WRITER_USER}";
+EOSQL

@@ -1,39 +1,3 @@
--- Database: dwd
-
--- DROP DATABASE IF EXISTS dwd;
-
-CREATE DATABASE dwd
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'English_Germany.utf8'
-    LC_CTYPE = 'English_Germany.utf8'
-    LOCALE_PROVIDER = 'libc'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
-GRANT TEMPORARY, CONNECT ON DATABASE dwd TO PUBLIC;
-
-GRANT CONNECT ON DATABASE dwd TO dwd_writer;
-
-GRANT ALL ON DATABASE dwd TO postgres;
-
-
--- Role: dwd_writer
--- DROP ROLE IF EXISTS dwd_writer;
-
-CREATE ROLE dwd_writer WITH
-  LOGIN
-  NOSUPERUSER
-  INHERIT
-  NOCREATEDB
-  NOCREATEROLE
-  NOREPLICATION
-  NOBYPASSRLS
-  ENCRYPTED PASSWORD 'SCRAM-SHA-256$4096:R6AyvhqpV5926a3I5aAWMQ==$2VnDnPOiYiGjO05TtHMc/7bKqSW7guZlTN08mn01FMc=:XPvQN1dRV0qYW/W0P9Bz80ybFaOIZwPQ0qp9Dsq/uhw=';
-
-
 -- Table: public.station
 
 -- DROP TABLE IF EXISTS public.station;
@@ -57,10 +21,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.station
     OWNER to postgres;
-
-REVOKE ALL ON TABLE public.station FROM dwd_writer;
-
-GRANT INSERT, SELECT, UPDATE ON TABLE public.station TO dwd_writer;
 
 GRANT ALL ON TABLE public.station TO postgres;
 
@@ -90,9 +50,5 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.temperature
     OWNER to postgres;
-
-REVOKE ALL ON TABLE public.temperature FROM dwd_writer;
-
-GRANT INSERT, SELECT, UPDATE ON TABLE public.temperature TO dwd_writer;
 
 GRANT ALL ON TABLE public.temperature TO postgres;

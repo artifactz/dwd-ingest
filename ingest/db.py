@@ -1,9 +1,44 @@
 from typing import Optional
+import os, time
 from datetime import datetime
 import psycopg2
 
 
-connection = psycopg2.connect(database="dwd", user="dwd_writer", password="dwdw", host="localhost", port=5432)
+PG_HOST = os.getenv("PG_HOST", "localhost")
+PG_PORT = int(os.getenv("PG_PORT", "5432"))
+PG_DB = os.getenv("PG_DB", "dwd")
+PG_USER = os.getenv("PG_USER", "dwd_writer")
+PG_PASS = os.getenv("PG_PASS", "dwdw")
+
+
+def _connect(total_timeout_seconds: float = 20.0, initial_wait_seconds: float = 0.25, wait_scale: float = 1.5):
+    """
+    Connects with retries.
+
+    Args:
+        total_timeout_seconds: Total time to wait for the database to become available.
+        initial_wait_seconds: Initial wait time before retrying.
+        wait_scale: Scale factor for increasing wait time after each retry.
+
+    Returns:
+        psycopg2 connection object.
+    """
+    t0 = time.time()
+    wait_seconds = initial_wait_seconds
+
+    while time.time() - t0 < total_timeout_seconds:
+        try:
+            return psycopg2.connect(database=PG_DB, user=PG_USER, password=PG_PASS, host=PG_HOST, port=PG_PORT)
+
+        except psycopg2.OperationalError:
+            print("Waiting for database...")
+            time.sleep(wait_seconds)
+            wait_seconds *= wait_scale
+
+    raise RuntimeError(f"Could not connect to database after {total_timeout_seconds} seconds.")
+
+
+connection = _connect()
 
 
 def has_station(station_id: int) -> bool:
