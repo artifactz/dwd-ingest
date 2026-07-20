@@ -9,11 +9,34 @@ services:
       PG_DB: ${PG_DB}
       PG_WRITER_USER: ${PG_WRITER_USER}
       PG_WRITER_PASS: ${PG_WRITER_PASS}
+      PG_GRAFANA_USER: ${PG_GRAFANA_USER}
+      PG_GRAFANA_PASS: ${PG_GRAFANA_PASS}
     ports:
       - "5433:5432"
     volumes:
       - pg_data:/var/lib/postgresql
       - ./postgres_init:/docker-entrypoint-initdb.d:ro
+
+  grafana:
+    image: grafana/grafana:9.5.0
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_PASS}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - PG_HOST=postgres
+      - PG_PORT=5432
+      - PG_DB=${PG_DB}
+      - PG_USER=${PG_GRAFANA_USER}
+      - PG_PASS=${PG_GRAFANA_PASS}
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - postgres
 
   ingest:
     build: ./ingest

@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: DWD PostgreSQL
+    uid: dwd_postgres
+    type: postgres
+    access: proxy
+    url: ${PG_HOST}:${PG_PORT}
+    user: ${PG_USER}
+    secureJsonData:
+      password: ${PG_PASS}
+    database: ${PG_DB}
+    isDefault: true
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1800
+      timescaledb: false
