@@ -86,13 +86,13 @@ def get_latest_publish_time(station_id: int) -> Optional[datetime]:
         return result[0] if result else None
 
 
-def set_latest_publish_time(station_id: int, timestamp: datetime):
+def set_latest_publish_time(station_id: int, timestamp: Optional[datetime]):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE station SET temperature_published_timestamp = %s WHERE id = %s", (timestamp, station_id))
     connection.commit()
 
 
-def insert_temperature_data(station_id: int, data: list[dict], published_online: datetime):
+def insert_temperature_data(station_id: int, data: list[dict], published_online: Optional[datetime]):
     now = datetime.now()
     params = []
     for row in data:
