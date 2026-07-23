@@ -1,1 +1,6 @@
 .env
+__pycache__
+.venv
+.vscode
+nagios/etc/htpasswd.users
+nagios/var
