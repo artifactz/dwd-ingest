@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS public.station
     name character varying(80) COLLATE pg_catalog."default",
     region character varying(80) COLLATE pg_catalog."default",
     timestamp_added timestamp(3) with time zone,
-    temperature_published_timestamp timestamp(0) without time zone,
+    temperature_now_published_timestamp timestamp(0) without time zone,
+    temperature_recent_published_timestamp timestamp(0) without time zone,
     CONSTRAINT station_pkey PRIMARY KEY (id)
 )
 

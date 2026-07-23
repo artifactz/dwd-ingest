@@ -1,6 +1,6 @@
 from typing import Optional
 import os, time
-from datetime import datetime
+from datetime import datetime, date
 import psycopg2
 
 
@@ -48,7 +48,7 @@ def has_station(station_id: int) -> bool:
 
 
 def insert_station_data(data: list[dict[str, str]]):
-    now = datetime.now()
+    now = datetime.now().astimezone()
     params = []
     for row in data:
         id_ = int(row["Stations_id"])
@@ -79,16 +79,25 @@ def insert_station_data(data: list[dict[str, str]]):
     connection.commit()
 
 
-def get_latest_publish_time(station_id: int) -> Optional[datetime]:
+def get_latest_publish_time(station_id: int, term: str) -> Optional[datetime]:
+    term = term.lower()
+    assert term == "now" or term == "recent"
+
     with connection.cursor() as cursor:
-        cursor.execute("SELECT temperature_published_timestamp FROM station WHERE id = %s", (station_id,))
+        cursor.execute(f"SELECT temperature_{term}_published_timestamp FROM station WHERE id = %s", (station_id,))
         result = cursor.fetchone()
         return result[0] if result else None
 
 
-def set_latest_publish_time(station_id: int, timestamp: Optional[datetime]):
+def set_latest_publish_time(station_id: int, term: str, timestamp: Optional[datetime]):
+    term = term.lower()
+    assert term == "now" or term == "recent"
+
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE station SET temperature_published_timestamp = %s WHERE id = %s", (timestamp, station_id))
+        cursor.execute(
+            f"UPDATE station SET temperature_{term}_published_timestamp = %s WHERE id = %s",
+            (timestamp, station_id)
+        )
     connection.commit()
 
 
@@ -121,3 +130,13 @@ def insert_temperature_data(station_id: int, data: list[dict], published_online:
     with connection.cursor() as cursor:
         cursor.executemany(sql, params)
     connection.commit()
+
+
+def get_latest_temperature_timestamp_on_day(station_id: int, timestamp: date) -> Optional[datetime]:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT timestamp FROM temperature WHERE station_id = %s AND timestamp::DATE = %s ORDER BY timestamp DESC LIMIT 1",
+            (station_id, timestamp)
+        )
+        result = cursor.fetchone()
+        return result[0] if result else None
