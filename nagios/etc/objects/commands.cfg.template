@@ -1,0 +1,11 @@
+define command {
+  command_name    check_pgactivity
+  command_line    /usr/lib/nagios/plugins/check_pgactivity \
+                  --host=${PG_HOST} \
+                  --port=${PG_PORT} \
+                  --username=${PG_NAGIOS_USER} \
+                  --status-file=/opt/nagios/var/check_pgactivity.data \
+                  --service=$ARG1$ \
+                  -w $ARG2$ \
+                  -c $ARG3$
+}

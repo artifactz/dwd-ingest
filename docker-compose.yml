@@ -3,14 +3,16 @@ services:
   postgres:
     image: postgres:18
     environment:
-      POSTGRES_DB: ${PG_DB}
-      POSTGRES_USER: ${PG_SUPER_USER}
-      POSTGRES_PASSWORD: ${PG_SUPER_PASS}
-      PG_DB: ${PG_DB}
-      PG_WRITER_USER: ${PG_WRITER_USER}
-      PG_WRITER_PASS: ${PG_WRITER_PASS}
-      PG_GRAFANA_USER: ${PG_GRAFANA_USER}
-      PG_GRAFANA_PASS: ${PG_GRAFANA_PASS}
+      - POSTGRES_DB=${PG_DB}
+      - POSTGRES_USER=${PG_SUPER_USER}
+      - POSTGRES_PASSWORD=${PG_SUPER_PASS}
+      - PG_DB=${PG_DB}
+      - PG_WRITER_USER=${PG_WRITER_USER}
+      - PG_WRITER_PASS=${PG_WRITER_PASS}
+      - PG_GRAFANA_USER=${PG_GRAFANA_USER}
+      - PG_GRAFANA_PASS=${PG_GRAFANA_PASS}
+      - PG_NAGIOS_USER=${PG_NAGIOS_USER}
+      - PG_NAGIOS_PASS=${PG_NAGIOS_PASS}
     ports:
       - "5433:5432"
     volumes:
@@ -35,6 +37,23 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - postgres
+
+  nagios:
+    build:
+      context: ./nagios
+      args:
+      - PG_HOST=postgres
+      - PG_PORT=5432
+      - PG_NAGIOS_USER=${PG_NAGIOS_USER}
+    environment:
+      - PGPASSWORD=${PG_NAGIOS_PASS}
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nagios/etc/monitor/postgres.cfg:/opt/nagios/etc/monitor/postgres.cfg
+      - ./nagios/var:/opt/nagios/var
     depends_on:
       - postgres
 
