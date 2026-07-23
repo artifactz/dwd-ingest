@@ -107,7 +107,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp, temperature_2m_c\r\nFROM temperature\r\nWHERE station_id = $station_id\r\nORDER BY timestamp DESC;\r\n",
+          "rawSql": "SELECT timestamp, temperature_2m_c\r\nFROM temperature\r\nWHERE station_id = $station_id AND temperature_2m_c > -999\r\nORDER BY timestamp DESC;\r\n",
           "refId": "A",
           "sql": {
             "columns": [
